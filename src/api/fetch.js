@@ -14,12 +14,14 @@ export async function request (obj = {}) {
   if(obj.method && `${obj.method}`.toUpperCase() !== 'GET' && obj.params) {
     url = webUrlSplicing(url, obj.params)
   }
-  let [error, res] = await uni.request({
+  let [error, res] = await wx.request({
     url,
     data: obj.data || {},
     method: obj.method ? `${obj.method}`.toUpperCase() : 'GET',
-    header: obj.header || {}
+    header: obj.header || {},
+    dataType: '其他'
   });
+  console.log(res)
   if (error) {
     uni.showToast({
       title: '网络错误，请稍后重试',
@@ -28,7 +30,7 @@ export async function request (obj = {}) {
     });
     return
   }
-  // console.log(res)
+
   if (res.statusCode === 200) {
     return res.data
   } else {

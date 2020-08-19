@@ -1,13 +1,13 @@
 {
 	"pages": [
 		{
-			"path": "pages/answer/answer",
+			"path": "pages/top250/top250",
 			"style": {
 				"navigationBarTitleText": "豆瓣电影Top250"
 			}
 		},
 		{
-			"path": "pages/answer/detail",
+			"path": "pages/top250/detail",
 			"style": {
 				"navigationBarTitleText": "豆瓣电影Top250"
 			}
@@ -42,7 +42,7 @@
 		"backgroundColor": "#f7f7f7",
 		"list": [
 			{
-				"pagePath": "pages/answer/answer",
+				"pagePath": "pages/top250/top250",
 				"iconPath": "static/img/movie-0.png",
 				"selectedIconPath": "static/img/movie-1.png",
 				"text": "Top250"

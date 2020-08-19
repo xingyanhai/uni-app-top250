@@ -47,6 +47,8 @@
 		mapState,
 		mapMutations
 	} from 'vuex'
+	// import cheerio from 'cheerio'
+	import {request} from '../../api/fetch'
 	export default {
 		data() {
 			return {
@@ -76,47 +78,107 @@
 					}
 				})
 			},
-			async getData() {
-				if(this.loading) {
-					return
-				}
-				this.loading = true
-				this.loadMoreText = '加载中...'
-				let res = await wx.cloud.callFunction({
-					name: 'getDbListData',
+
+			/* ----------------------获取豆瓣电影 start--------------- */
+			async getMovieList (data) {
+				let returnData;
+				// 打开页面时间
+				const startTime = new Date();
+				// 渲染URL
+				const url = `https://movie.douban.com/top250`;
+				const html = await request({
+					url,
 					data: {
-						dbName: 'zhihuImgAnswer',
-						pageNo: this.pageNo,
-						pageSize: this.pageSize,
-						limitType: 3,
-						params: {
-						},
-						orderName: 'answerUpNum',
-						orderType: 'desc'
-					}
-				})
-				this.loading = false
-				this.totalCount = res.result.totalCount
-				const data = res.result.data;
-				if(data && data.length) {
-					this.pageNo += 1
+						start: data.start
+					},
+					header: {
+						"Content-Type": "application/text"
+					},
+					timeout: 60000,
+				});
+				try {
+					// 使用request.js库发送get请求
+					// const html = await request({
+					// 	url,
+					// 	data: {
+					// 		start: data.start
+					// 	},
+					// 	header: {
+					// 		"Content-Type": "application/text"
+					// 	},
+					// 	timeout: 60000,
+					// });
+					// 载入并初始化cheerio
+					// const $ = cheerio.load(html);
+					// let $list = $('.grid_view .item')
+					// let saveData = []
+					// for (let i = 0; i < $list.length; i++) {
+					// 	let $item = $($list[i])
+					// 	let url = $item.find('.info a').attr('href');
+					// 	let index = Number($item.find('.pic em').text())
+					// 	let coverImgSrc = $item.find('.pic img').attr('src')
+					// 	let name = $item.find('.info a span').eq(0).text()
+					// 	let totalName = $item.find('.info a').text()
+					// 	let infoList = $item.find('.info .bd p').eq(0).text().split('\n')
+					// 	let actorText = infoList[1]
+					// 	let typeText = infoList[2]
+					// 	let score = $item.find('.info .rating_num').text()
+					// 	let commitCount = $item.find('.star span').last().text()
+					// 	let oneWord = $item.find('.info .quote .inq').text()
+					// 	saveData.push({
+					// 		url,
+					// 		movieId: url.split('/')[url.split('/').length - 2],
+					// 		index,
+					// 		coverImgSrc,
+					// 		name,
+					// 		totalName,
+					// 		actorText,
+					// 		typeText,
+					// 		score,
+					// 		commitCount,
+					// 		oneWord,
+					// 	})
+					// }
+					// returnData = saveData;
+				} catch (err) {
+					console.log(`page发生错误：${err}`);
 				}
-				let list = [];
-				for (var i = 0; i < data.length; i++) {
-					let item = data[i];
-					list.push({
-						...item
-					});
-				}
-				this.dataList = this.dataList.concat(list);
-				if(data.length < this.pageSize) {
-					this.loadMoreText = '没有更多了'
-				}
-				if(this.dataList && this.dataList.length<=0) {
-					this.loadMoreText = '暂无数据'
-					this.dataList = list;
-				}
+				console.log(`页面耗时: ${new Date() - startTime}ms，渲染页URL：${url}`);
+				return returnData
 			},
+			// 获取豆瓣电影
+			async getDoubanMovie(data) {
+				let returnData = []
+				// 打开页面时间
+				const startTime = new Date();
+				try {
+					this.getMovieList({
+						start: 0
+					})
+
+					// let arr = []
+					// for (let i = 0; i < 250; i += 25) {
+					// 	arr.push(
+					// 			this.getMovieList({
+					// 				start: i
+					// 			})
+					// 	)
+					// }
+					// let res = await Promise.all(arr)
+					// if (res && res.length) {
+					// 	res.forEach(e => {
+					// 		if (e.length) {
+					// 			returnData.push(...e)
+					// 		}
+					// 	})
+					// }
+				} catch (err) {
+					console.log(err)
+				}
+				console.log(`页面耗时: ${new Date() - startTime}ms，渲染页URL`);
+				console.log(returnData)
+			},
+			/* ----------------------获取豆瓣电影 end--------------- */
 
 			toDetail (data) {
 				uni.navigateTo({
@@ -130,13 +192,13 @@
 				this.loadMoreText = '没有更多了'
 				return;
 			}
-			this.getData();
+			this.getDoubanMovie();
 		},
 		// 加了这个页面才可以被分享
 		onShareAppMessage: function (res) {
 		},
 		async onLoad() {
-			this.getData()
+			this.getDoubanMovie()
 		}
 	}
 </script>
