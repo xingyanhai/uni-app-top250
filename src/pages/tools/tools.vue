@@ -7,7 +7,7 @@
 			<input class="input" v-model="count" placeholder="输入count"/>
 		</view>
 		<view class="button-view">
-			<button type="primary" @click="updateData">添加/更新话题回答</button>
+			<button type="primary" @click="updateData">添加/更新</button>
 		</view>
 	</form>
 </template>

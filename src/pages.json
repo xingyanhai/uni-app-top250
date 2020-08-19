@@ -3,13 +3,13 @@
 		{
 			"path": "pages/answer/answer",
 			"style": {
-				"navigationBarTitleText": "高赞回答"
+				"navigationBarTitleText": "豆瓣电影Top250"
 			}
 		},
 		{
 			"path": "pages/answer/detail",
 			"style": {
-				"navigationBarTitleText": "高赞回答"
+				"navigationBarTitleText": "豆瓣电影Top250"
 			}
 		},
 		{
@@ -31,21 +31,21 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "高赞回答",
+		"navigationBarTitleText": "豆瓣电影Top250",
 		"navigationBarBackgroundColor": "#ffffff",
-		"backgroundColor": "#f6f6f6"
+		"backgroundColor": "#f7f7f7"
 	},
 	"tabBar": {
-		"color": "#444444",
-		"selectedColor": "#0084ff",
+		"color": "#818181",
+		"selectedColor": "#5ba757",
 		"borderStyle": "black",
-		"backgroundColor": "#ffffff",
+		"backgroundColor": "#f7f7f7",
 		"list": [
 			{
 				"pagePath": "pages/answer/answer",
-				"iconPath": "static/img/txt-0.png",
-				"selectedIconPath": "static/img/txt-1.png",
-				"text": "回答"
+				"iconPath": "static/img/movie-0.png",
+				"selectedIconPath": "static/img/movie-1.png",
+				"text": "Top250"
 			},
 			{
 				"pagePath": "pages/center/center",
@@ -56,6 +56,6 @@
 		]
 	},
 	"window": {
-		"backgroundColor": "#ffffff"
+		"backgroundColor": "#f7f7f7"
 	}
 }

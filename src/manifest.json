@@ -1,7 +1,7 @@
 {
-    "name" : "知图",
+    "name" : "豆瓣电影Top250",
     "appid" : "",
-    "description" : "-知乎图片精选-",
+    "description" : "-豆瓣电影Top250-",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wxe935513823b55267",
+        "appid" : "wxbd91f8843b8685c9",
         "cloudfunctionRoot": "./functions/",
         "setting" : {
             "urlCheck" : false

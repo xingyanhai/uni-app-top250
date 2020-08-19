@@ -53,6 +53,9 @@
 		methods: {
 			...mapMutations(['getUserInfo','setStateData']),
             getUserInfoClick (e) {
+			  if (this.userInfo && this.userInfo.nickName) {
+			  	return
+			  }
               e.detail.userInfo.isLogin = true
               wx.cloud.init()                              //调用前需先调用init
               wx.cloud.callFunction({
