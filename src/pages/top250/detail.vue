@@ -1,5 +1,6 @@
 <template>
 	<view class="new-page">
+		<video :src="currentUrl"></video>
 	</view>
 </template>
 
@@ -11,6 +12,9 @@
 			return {
 				movieId: '',
 				movieName: '',
+				movieData: {},
+				urlList: '',
+				currentUrl: ''
 			}
 		},
 		computed: {
@@ -26,7 +30,31 @@
 
 		methods: {
 			async getData() {
-
+				uni.showLoading({
+					title: '视频加载中，请耐心等待'
+				})
+				let res = await wx.cloud.callFunction({
+					name: 'getSearchVideo',
+					data: {
+						search: this.movieName,
+						movieId: this.movieId
+					}
+				})
+				uni.hideLoading()
+				if(res.errMsg === 'cloud.callFunction:ok') {
+					let data = res.result
+					if(data && data.videoName) {
+						this.movieData = data || {}
+						this.urlList = data.urlList
+						if(this.urlList && this.urlList.length) {
+							this.currentUrl = this.urlList[0].value
+						}
+					} else {
+						this.noData = true
+					}
+				} else {
+					console.log('error')
+				}
 			},
 		},
 		// 加了这个页面才可以被分享

@@ -1,4 +1,4 @@
-const env = 'test-xyh'
+const env = 'test-xyh-top250'
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
 
