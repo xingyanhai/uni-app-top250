@@ -1,14 +1,5 @@
 <template>
 	<view class="new-page">
-		<view class="list-box">
-			<view v-for="(item, index) in dataList"
-				  @tap="goDetail(index)"
-				  :key="item.src"
-				  class="list-item">
-					<image class="img" :src="item.src" mode="aspectFill"></image>
-			</view>
-		</view>
-		<text v-if="loadMoreText" class="loadMore">{{loadMoreText}}</text>
 	</view>
 </template>
 
@@ -18,23 +9,11 @@
 	export default {
 		data() {
 			return {
-				categoryId: '',
-				totalDataList: [],
-				loadMoreText: '',
-				loading: false,
-				num: 10,
-				nextPageUrl: null,
-				query: {}
+				movieId: '',
+				movieName: '',
 			}
 		},
 		computed: {
-			dataList () {
-				return this.totalDataList.map(e => {
-					return {
-						src: e
-					}
-				})
-			},
 		},
 		onReachBottom() {
 			// console.log('滑动到页面底部')
@@ -46,42 +25,20 @@
 		},
 
 		methods: {
-			goDetail(index) {
-				console.log(index)
-				uni.previewImage({
-					current: this.dataList[index].src,
-					urls: [this.dataList[index].src]
-				})
-			},
 			async getData() {
 
-				this.loadMoreText = '加载中...'
-				let res = await wx.cloud.callFunction({
-					name: 'getDbListData',
-					data: {
-						dbName: 'zhihuImgAnswer',
-						pageNo: 1,
-						pageSize: 1,
-						limitType: 3,
-						params: {
-							_id: this.query.id
-						}
-					}
-				})
-				this.loadMoreText = '没有更多了'
-				let data = res.result.data[0]
-				this.totalDataList = data.answerImgList
-				uni.setNavigationBarTitle({
-					title: data.authorName
-				});
 			},
 		},
 		// 加了这个页面才可以被分享
 		onShareAppMessage () {
 		},
-		async onLoad(query) {
-			this.query = query
+		async onLoad(data) {
+			this.movieName = data.name
+			this.movieId = data.movieId
 			this.getData()
+			uni.setNavigationBarTitle({
+				title: data.name
+			});
 		},
 	}
 </script>

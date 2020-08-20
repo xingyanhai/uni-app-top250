@@ -212,7 +212,7 @@
 
 			toDetail (data) {
 				uni.navigateTo({
-					url: `/pages/answer/detail?id=${data._id}`
+					url: `/pages/top250/detail?id=${data.movieId}&name=${data.name}`
 				})
 			}
 		},
