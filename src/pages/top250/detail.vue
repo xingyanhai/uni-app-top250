@@ -51,6 +51,10 @@
 						}
 					} else {
 						this.noData = true
+						uni.showToast({
+							title: `抱歉，暂无视频播放源!`,
+							icon: 'none',
+						})
 					}
 				} else {
 					console.log('error')
