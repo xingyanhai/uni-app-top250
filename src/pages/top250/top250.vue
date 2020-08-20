@@ -47,8 +47,8 @@
 		mapState,
 		mapMutations
 	} from 'vuex'
-	// import cheerio from 'cheerio'
 	import {request} from '../../api/fetch'
+	import HtmlToJson from '../wxParse/html2json'
 	export default {
 		data() {
 			return {
@@ -78,84 +78,95 @@
 					}
 				})
 			},
-
+			// 树状结构转平行结构
+			changeData (item, arr) {
+				arr.push(item)
+				if (item.nodes && item.nodes.length) {
+					for(let i = 0; i < item.nodes.length;i++) {
+						this.changeData(item.nodes[i], arr)
+					}
+				}
+			},
+			getSaveData (arr) {
+				let obj = {}
+				for(let i = 0;i<arr.length;i++) {
+					let item = arr[i]
+					if(item.tag === 'img') {
+						obj.coverImgSrc = item.attr.src
+						obj.name = item.attr.alt
+					} else if (item.tag === 'a' && item.attr.href.startsWith('https://movie.douban.com')) {
+						let url = item.attr.href
+						obj.url = url
+						obj.movieId = url.split('/')[url.split('/').length - 2]
+					} else if(item.classStr === 'other') {
+						obj.otherName = item.nodes[0].text
+					} else if(item.classStr === 'bd') {
+						obj.actorText = `${item.nodes[0].nodes[0].text}`.trim()
+						obj.typeText = `${item.nodes[0].nodes[2].text}`.trim()
+					} else if(item.tag === 'em') {
+						obj.index = item.nodes[0].text
+					} else if(item.classStr === 'rating_num') {
+						obj.score = item.nodes[0].text
+					} else if(`${item.text}`.endsWith('人评价')) {
+						obj.commitCount = item.text
+					} else if(`${item.classStr}` === 'inq') {
+						obj.oneWord = item.nodes && item.nodes[0] && item.nodes[0].text
+					}
+				}
+				return obj
+			},
+			getChildNodes (nodes, targetArr) {
+				if(nodes && nodes.length) {
+					for(let i = 0;i<nodes.length;i++) {
+						if(nodes[i].classStr === 'grid_view') {
+							targetArr.push(...nodes[i].nodes)
+							return
+						}
+						this.getChildNodes(nodes[i].nodes, targetArr)
+					}
+				}
+			},
 			/* ----------------------获取豆瓣电影 start--------------- */
 			async getMovieList (data) {
+				let url = `https://movie.douban.com/top250`;
 				let returnData;
-				// 打开页面时间
-				const startTime = new Date();
-				// 渲染URL
-				const url = `https://movie.douban.com/top250`;
-				const html = await request({
-					url,
-					data: {
-						start: data.start
-					},
-					header: {
-						"Content-Type": "application/text"
-					},
-					timeout: 60000,
-				});
 				try {
-					// 使用request.js库发送get请求
-					// const html = await request({
-					// 	url,
-					// 	data: {
-					// 		start: data.start
-					// 	},
-					// 	header: {
-					// 		"Content-Type": "application/text"
-					// 	},
-					// 	timeout: 60000,
-					// });
-					// 载入并初始化cheerio
-					// const $ = cheerio.load(html);
-					// let $list = $('.grid_view .item')
-					// let saveData = []
-					// for (let i = 0; i < $list.length; i++) {
-					// 	let $item = $($list[i])
-					// 	let url = $item.find('.info a').attr('href');
-					// 	let index = Number($item.find('.pic em').text())
-					// 	let coverImgSrc = $item.find('.pic img').attr('src')
-					// 	let name = $item.find('.info a span').eq(0).text()
-					// 	let totalName = $item.find('.info a').text()
-					// 	let infoList = $item.find('.info .bd p').eq(0).text().split('\n')
-					// 	let actorText = infoList[1]
-					// 	let typeText = infoList[2]
-					// 	let score = $item.find('.info .rating_num').text()
-					// 	let commitCount = $item.find('.star span').last().text()
-					// 	let oneWord = $item.find('.info .quote .inq').text()
-					// 	saveData.push({
-					// 		url,
-					// 		movieId: url.split('/')[url.split('/').length - 2],
-					// 		index,
-					// 		coverImgSrc,
-					// 		name,
-					// 		totalName,
-					// 		actorText,
-					// 		typeText,
-					// 		score,
-					// 		commitCount,
-					// 		oneWord,
-					// 	})
-					// }
-					// returnData = saveData;
+					// 渲染URL
+					const html = await request({
+						url,
+						data: {
+							start: data.start
+						},
+						header: {
+							"Content-Type": "application/text"
+						},
+						timeout: 60000,
+					});
+					let transData = HtmlToJson.html2json(html, 'htmlData');
+					// 这里循环遍历至到找到 node.classStr = 'grid_view'
+					let nodes = transData.nodes
+					let targetArr = [];
+					this.getChildNodes(nodes, targetArr)
+					let saveList = []
+					for(let i = 0; i < targetArr.length; i++) {
+						let itemArr = []
+						this.changeData(targetArr[i], itemArr)
+						let saveData = this.getSaveData(itemArr)
+						saveList.push(saveData)
+					}
+					returnData = saveList
 				} catch (err) {
 					console.log(`page发生错误：${err}`);
 				}
-				console.log(`页面耗时: ${new Date() - startTime}ms，渲染页URL：${url}`);
 				return returnData
 			},
 			// 获取豆瓣电影
-			async getDoubanMovie(data) {
-				let returnData = []
-				// 打开页面时间
-				const startTime = new Date();
+			async getDoubanMovie() {
 				try {
-					this.getMovieList({
+					let res = await this.getMovieList({
 						start: 0
 					})
-
+					console.log('res---', res)
 					// let arr = []
 					// for (let i = 0; i < 250; i += 25) {
 					// 	arr.push(
@@ -175,8 +186,6 @@
 				} catch (err) {
 					console.log(err)
 				}
-				console.log(`页面耗时: ${new Date() - startTime}ms，渲染页URL`);
-				console.log(returnData)
 			},
 			/* ----------------------获取豆瓣电影 end--------------- */
 
@@ -187,12 +196,12 @@
 			}
 		},
 		onReachBottom() {
-			console.log('滑动到页面底部')
-			if ((this.pageNo -1) *this.pageSize >= this.totalCount || this.dataList.length >= this.totalCount) {
-				this.loadMoreText = '没有更多了'
-				return;
-			}
-			this.getDoubanMovie();
+			// console.log('滑动到页面底部')
+			// if ((this.pageNo -1) *this.pageSize >= this.totalCount || this.dataList.length >= this.totalCount) {
+			// 	this.loadMoreText = '没有更多了'
+			// 	return;
+			// }
+			// this.getDoubanMovie();
 		},
 		// 加了这个页面才可以被分享
 		onShareAppMessage: function (res) {
