@@ -6,31 +6,27 @@
 			<view class="item" v-for="(value, index) in dataList"
 				  :key="index"
 				  @tap="toDetail(value)">
-				<view class="title">
-					{{value.questionName}}
+				<view class="left">
+					<text class="no">No.{{value.index}}</text>
+					<image class="img" mode="widthFix" :src="value.coverImgSrc"></image>
 				</view>
-				<view class="content">
-					<view class="left">
-						<view class="author">
-							<view class="author-left">
-								<image class="author-img" :src="value.authorImg"></image>
-								<view class="author-name">{{value.authorName}}</view>
-							</view>
-							<view class="author-text">{{value.authorBadgeText}}</view>
+				<view class="right">
+					<view class="title">{{value.name}}</view>
+					<view class="content">
+						<view class="c-item score">
+							<text>评分 <text class="value">{{value.score}}</text></text>
+							<text class="commit">{{value.commitCount}}</text>
 						</view>
-						<view>
-							<view class="answer-up-num">{{value.answerUpNum}}赞</view>
-							<view>共{{value.answerImgList.length}}张图片</view>
+						<view class="c-item">
+							{{value.actorText}}
 						</view>
-						<view>{{value.editTimeText}}</view>
+						<view class="c-item">
+							{{value.typeText}}
+						</view>
+						<text class="on-word">
+							“{{value.oneWord}}”
+						</text>
 					</view>
-					<view class="right">
-						<image class="img" mode="aspectFill" :src="value.answerImgList[0]"></image>
-					</view>
-				</view>
-				<view class="bottom">
-					<view class="num1">问题关注量{{value.questionFollowNum}}</view>
-					<view>浏览量{{value.questionReadNum}}</view>
 				</view>
 			</view>
 		</view>
@@ -247,68 +243,51 @@
 	display flex
 	flex-direction column
 	width 100%
+	padding 10px
 	.item
-		display block
-		margin 5px
-		padding 5px
-		border-radius 5px
+		display flex
+		border-radius 10px
 		background-color #fff
-		.title
-			width 100%;
-			font-size 18px
-			margin 5px 0
-		.content
-			display flex
-			width 100%
-			overflow hidden
-			justify-content space-between
-			.left
+		padding 15px 10px
+		margin 10px 0
+		.left
+			width 100px
+			margin-right 10px
+			position relative
+			.img
+				border-radius 6px
+			.no
+				position absolute
+				top 5px
+				left 5px
+				font-size 10px
+				line-height 12px
+				background-color #f8c543
+				border-radius 2px
+				padding 0 2px
+		.right
+			display block
+			flex 1
+			.title
+				font-size 16px
+				font-weight bold
+			.content
 				display block
-				flex 1
-				max-width calc(100vw - 120px)
-				.answer-up-num
-					margin-right 10px
-				.author
-					line-height 30px
-					width 100%
-					display flex
-					align-items center
-					font-size 12px;
-					.author-left
-						display flex
-						align-items center
-						.author-img
-							width 22px;
-							height 22px;
-							border-radius 2px
-						.author-name
-							padding-left 3px
-							white-space nowrap
-					.author-text
-						color $uni-text-light-color
-						padding-left 3px
-						flex 1
-						white-space: nowrap;
-						text-overflow: ellipsis;
-						overflow: hidden;
-						word-break: break-all;
-			.right
-				padding-left: 12px;
-				overflow hidden
-				flex-shrink 0
-				.img
-					border-radius: 4px;
-					height: 60px;
-					width: 90px;
-		.bottom
-			display flex
-			font-size 12px
-			line-height 30px
-			justify-content flex-end
-			view
-				color $uni-text-light-color
-			.num1
-				margin-right 10px
+				font-size 14px
+				color $uni-text-color
+				.c-item
+					padding 2px 0
+				.score
+					.value
+						color #eb7123
+						font-weight bold
+					.commit
+						margin-left 10px
+				.on-word
+					font-size 12px
+					border-radius 2px
+					padding 0 2px
+					border 1px solid $uni-border-color
 .center
 	text-align center
 	margin 20px 0
