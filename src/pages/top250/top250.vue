@@ -57,7 +57,8 @@
 				pageNo:1,
 				pageSize: 20,
 				dataList: [],
-				loading: false
+				loading: false,
+				start: 0
 			};
 		},
 		components: {SearchBtn},
@@ -90,27 +91,31 @@
 			getSaveData (arr) {
 				let obj = {}
 				for(let i = 0;i<arr.length;i++) {
-					let item = arr[i]
-					if(item.tag === 'img') {
-						obj.coverImgSrc = item.attr.src
-						obj.name = item.attr.alt
-					} else if (item.tag === 'a' && item.attr.href.startsWith('https://movie.douban.com')) {
-						let url = item.attr.href
-						obj.url = url
-						obj.movieId = url.split('/')[url.split('/').length - 2]
-					} else if(item.classStr === 'other') {
-						obj.otherName = item.nodes[0].text
-					} else if(item.classStr === 'bd') {
-						obj.actorText = `${item.nodes[0].nodes[0].text}`.trim()
-						obj.typeText = `${item.nodes[0].nodes[2].text}`.trim()
-					} else if(item.tag === 'em') {
-						obj.index = item.nodes[0].text
-					} else if(item.classStr === 'rating_num') {
-						obj.score = item.nodes[0].text
-					} else if(`${item.text}`.endsWith('人评价')) {
-						obj.commitCount = item.text
-					} else if(`${item.classStr}` === 'inq') {
-						obj.oneWord = item.nodes && item.nodes[0] && item.nodes[0].text
+					try {
+						let item = arr[i]
+						if(item.tag === 'img') {
+							obj.coverImgSrc = item.attr.src
+						} else if (item.tag === 'a' && item.attr.href.startsWith('https://movie.douban.com') && item.nodes && item.nodes.length > 1) {
+							let url = item.attr.href
+							obj.url = url
+							obj.movieId = url.split('/')[url.split('/').length - 2]
+							obj.name = item.nodes[0].nodes[0].text
+						} else if(item.classStr === 'other') {
+							obj.otherName = item.nodes[0].text
+						} else if(item.classStr === 'bd') {
+							obj.actorText = `${item.nodes[0].nodes[0].text}`.trim()
+							obj.typeText = `${item.nodes[0].nodes[2].text}`.trim()
+						} else if(item.tag === 'em') {
+							obj.index = item.nodes[0].text
+						} else if(item.classStr === 'rating_num') {
+							obj.score = item.nodes[0].text
+						} else if(`${item.text}`.endsWith('人评价')) {
+							obj.commitCount = item.text
+						} else if(`${item.classStr}` === 'inq') {
+							obj.oneWord = item.nodes && item.nodes[0] && item.nodes[0].text
+						}
+					} catch (e) {
+						console.log(e)
 					}
 				}
 				return obj
@@ -162,10 +167,30 @@
 			},
 			// 获取豆瓣电影
 			async getDoubanMovie() {
+				if (this.loading) {
+					return
+				}
+				if (this.dataList.length === 250) {
+					this.loadMoreText = '没有更多数据了'
+					return
+				}
 				try {
+					this.loading = true
+					this.loadMoreText = '加载中, 请稍后...'
 					let res = await this.getMovieList({
-						start: 0
+						start: this.start
 					})
+					if (res && res.length) {
+						this.dataList.push(...res)
+					}
+
+					if(this.dataList.length === 250) {
+						this.loadMoreText = '没有更多数据了'
+					} else {
+						this.loadMoreText = '上拉加载更多'
+						this.start += 25
+					}
+					this.loading = false
 					console.log('res---', res)
 					// let arr = []
 					// for (let i = 0; i < 250; i += 25) {
@@ -196,12 +221,7 @@
 			}
 		},
 		onReachBottom() {
-			// console.log('滑动到页面底部')
-			// if ((this.pageNo -1) *this.pageSize >= this.totalCount || this.dataList.length >= this.totalCount) {
-			// 	this.loadMoreText = '没有更多了'
-			// 	return;
-			// }
-			// this.getDoubanMovie();
+			this.getDoubanMovie();
 		},
 		// 加了这个页面才可以被分享
 		onShareAppMessage: function (res) {
