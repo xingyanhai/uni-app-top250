@@ -58,6 +58,10 @@
 					}
 				} else {
 					console.log('error')
+					uni.showToast({
+						title: `抱歉，获取视频信息失败!`,
+						icon: 'none',
+					})
 				}
 			},
 		},
