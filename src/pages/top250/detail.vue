@@ -1,6 +1,27 @@
 <template>
 	<view class="new-page">
-		<video :src="currentUrl"></video>
+		<video @waiting="videoWaiting"
+			   id="myVideo"
+			   class="video"
+			   :show-casting-button="true"
+			   @error="videoError"
+			   :title="movieName"
+			   :enable-play-gesture="true"
+			   picture-in-picture-mode="pop"
+			   autoplay
+			   controls
+			   :src="currentUrl">
+		</video>
+		<view>
+			<view>播放来源</view>
+			<view>
+				<radio-group @change="changeRadio">
+					<label class="radio" v-for="(item, index) in urlList" :key="index">
+						<radio :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
+					</label>
+				</radio-group>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -10,10 +31,11 @@
 	export default {
 		data() {
 			return {
+				videoContext: '',
 				movieId: '',
 				movieName: '',
 				movieData: {},
-				urlList: '',
+				urlList: [],
 				currentUrl: ''
 			}
 		},
@@ -29,6 +51,22 @@
 		},
 
 		methods: {
+			// 视频缓冲中
+			videoWaiting () {
+				console.log('视频缓冲中')
+			},
+			videoError () {
+				this.videoContext.stop()
+				uni.showToast({
+					title: `抱歉，视频加载失败，尝试其它播放源！`,
+					icon: 'none',
+				})
+			},
+			async changeRadio (e) {
+				this.currentUrl = e.detail.value
+				await this.$nextTick()
+				this.videoContext.play()
+			},
 			async getData() {
 				uni.showLoading({
 					title: '视频加载中，请耐心等待'
@@ -47,7 +85,7 @@
 						this.movieData = data || {}
 						this.urlList = data.urlList
 						if(this.urlList && this.urlList.length) {
-							this.currentUrl = this.urlList[0].value
+							this.currentUrl = this.urlList[1].value
 						}
 					} else {
 						this.noData = true
@@ -75,6 +113,7 @@
 			uni.setNavigationBarTitle({
 				title: data.name
 			});
+			this.videoContext = wx.createVideoContext('myVideo')
 		},
 	}
 </script>
@@ -84,57 +123,8 @@
 .new-page
 	display block
 	width 100%
-.head-area
-	padding-top: 70px;
-	display flex
-	flex-direction column
-	align-items center
+.video
 	width 100%
-	color white
-	background-color $uni-color-primary
-	padding-bottom 10px
-	.name
-		font-weight bold
-		font-size 30px
-		line-height 50px
-	.tip
-		font-size 14px
-		line-height 20px
-	.count
-		font-size 12px
-		line-height 20px
-.first-image-box
-	display flex
-	width 100%
-	position relative
-	.first-image
-		width 100%
-		box-sizing border-box
-		padding 0 1px
-	.new
-		position absolute
-		right 0
-		top 0
-		font-size 12px
-		padding 10px
-		color #fff
-.list-box
-	width 100%
-	display flex
-	flex-wrap wrap
-	box-sizing border-box
-	padding 1px 0
-	.list-item
-		&:nth-child(2n)
-			.img
-				padding-right 0
-		width 50%
-		height calc(100vh / 2)
-		.img
-			box-sizing border-box
-			width 100%
-			height 100%
-			padding 0 1px 1px 0
-			display block
+	height calc(100vw * 0.75)
 
 </style>
