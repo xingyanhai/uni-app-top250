@@ -12,14 +12,20 @@
 			   controls
 			   :src="currentUrl">
 		</video>
-		<view>
+		<view class="source-box">
 			<view>播放来源</view>
 			<view>
-				<radio-group @change="changeRadio">
+				<radio-group class="radio-box" @change="changeRadio">
 					<label class="radio" v-for="(item, index) in urlList" :key="index">
-						<radio :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
+						<radio color="#5ba757" :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
 					</label>
 				</radio-group>
+			</view>
+		</view>
+		<view class="des-box">
+			<view>剧情简介</view>
+			<view class="content">
+				{{movieData && (movieData.decs || '')}}
 			</view>
 		</view>
 	</view>
@@ -85,7 +91,7 @@
 						this.movieData = data || {}
 						this.urlList = data.urlList
 						if(this.urlList && this.urlList.length) {
-							this.currentUrl = this.urlList[1].value
+							this.currentUrl = this.urlList[0].value
 						}
 					} else {
 						this.noData = true
@@ -126,5 +132,25 @@
 .video
 	width 100%
 	height calc(100vw * 0.75)
-
+.source-box
+	display block
+	border-radius 10px
+	background-color #fff
+	padding 10px
+	margin 5px
+	.radio-box
+		display block
+		width 100%
+		.radio
+			border-bottom 1px solid $uni-border-color
+			display block
+			line-height 50px
+.des-box
+	display block
+	border-radius 10px
+	background-color #fff
+	padding 10px
+	margin 5px
+	.content
+		font-size 12px
 </style>
