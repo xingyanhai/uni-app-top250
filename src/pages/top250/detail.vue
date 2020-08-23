@@ -1,25 +1,27 @@
 <template>
 	<view class="new-page">
-		<video @waiting="videoWaiting"
-			   id="myVideo"
-			   class="video"
-			   :show-casting-button="true"
-			   @error="videoError"
-			   :title="movieName"
-			   :enable-play-gesture="true"
-			   picture-in-picture-mode="pop"
-			   autoplay
-			   controls
-			   :src="currentUrl">
-		</video>
-		<view class="source-box">
-			<view>播放来源</view>
-			<view>
-				<radio-group class="radio-box" @change="changeRadio">
-					<label class="radio" v-for="(item, index) in urlList" :key="index">
-						<radio color="#5ba757" :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
-					</label>
-				</radio-group>
+		<view class="video-box" v-if="config && config.showVideo">
+			<video @waiting="videoWaiting"
+				   id="myVideo"
+				   class="video"
+				   :show-casting-button="true"
+				   @error="videoError"
+				   :title="movieName"
+				   :enable-play-gesture="true"
+				   picture-in-picture-mode="pop"
+				   autoplay
+				   controls
+				   :src="currentUrl">
+			</video>
+			<view class="source-box">
+				<view>播放来源</view>
+				<view>
+					<radio-group class="radio-box" @change="changeRadio">
+						<label class="radio" v-for="(item, index) in urlList" :key="index">
+							<radio color="#5ba757" :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
+						</label>
+					</radio-group>
+				</view>
 			</view>
 		</view>
 		<view class="des-box">
@@ -34,6 +36,10 @@
 <script>
 	import * as api from '../../api/api'
 	import * as util from '../../common/util'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -46,6 +52,7 @@
 			}
 		},
 		computed: {
+			...mapState(['userInfo','config', 'userPower', 'shareImgUrl'])
 		},
 		onReachBottom() {
 			// console.log('滑动到页面底部')
@@ -129,6 +136,8 @@
 .new-page
 	display block
 	width 100%
+.video-box
+	display block
 .video
 	width 100%
 	height calc(100vw * 0.75)
