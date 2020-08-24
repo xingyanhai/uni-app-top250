@@ -58,7 +58,7 @@
 			};
 		},
 		components: {SearchBtn},
-        computed: mapState(['userInfo']),
+        computed: mapState(['userInfo', 'config']),
 		methods: {
 			...mapMutations(['getUserInfo','setStateData']),
 			copy (item) {
@@ -211,9 +211,11 @@
 			/* ----------------------获取豆瓣电影 end--------------- */
 
 			toDetail (data) {
-				uni.navigateTo({
-					url: `/pages/top250/detail?id=${data.movieId}&name=${data.name}`
-				})
+				if (this.config && this.config.showVideo) {
+					uni.navigateTo({
+						url: `/pages/top250/detail?id=${data.movieId}&name=${data.name}`
+					})
+				}
 			}
 		},
 		onReachBottom() {
