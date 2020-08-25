@@ -34,6 +34,11 @@
 				<text class="list-text">tools</text>
 				<text class="navigat-arrow">&#xe65e;</text>
 			</view>
+			<view class="center-list-item" @click="toOtherMiniProgram(value)"  v-for="(value, index) in shareList" :key="index">
+				<text class="xyh-icon list-icon">&#xe61f;</text>
+				<text class="list-text">{{value.shareText || '更多'}}</text>
+				<text class="navigat-arrow">&#xe65e;</text>
+			</view>
 		</view>
 	</view>
 </template>
@@ -49,7 +54,16 @@
 				avatarUrl: '/static/img/logo.png',
 			}
 		},
-		computed: mapState(['userInfo','config', 'userPower', 'shareImgUrl']),
+		computed: {
+			...mapState(['userInfo','config', 'userPower', 'shareImgUrl']),
+			shareList () {
+				let arr = []
+				if(this.config && this.config.shareMiniProgramList) {
+					return  this.config.shareMiniProgramList
+				}
+				return arr
+			}
+		},
 		methods: {
 			...mapMutations(['getUserInfo','setStateData']),
             getUserInfoClick (e) {
@@ -84,6 +98,14 @@
 				uni.navigateTo({
 					url
 				});
+			},
+			toOtherMiniProgram (item) {
+				wx.navigateToMiniProgram({
+					appId: item.appId,
+					success(res) {
+						// 打开成功1
+					}
+				})
 			},
 		},
        // 加了这个页面才可以被分享
