@@ -1,6 +1,6 @@
 <template>
 	<view class="new-page">
-		<view class="video-box" v-if="config && config.showVideo">
+		<view class="video-box">
 			<video @waiting="videoWaiting"
 				   id="myVideo"
 				   class="video"
@@ -13,17 +13,19 @@
 				   controls
 				   :src="currentUrl">
 			</video>
-			<view class="source-box">
-				<view>播放来源</view>
-				<view>
-					<radio-group class="radio-box" @change="changeRadio">
-						<label class="radio" v-for="(item, index) in urlList" :key="index">
-							<radio color="#5ba757" :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
-						</label>
-					</radio-group>
-				</view>
+		</view>
+
+		<view class="source-box">
+			<view>播放来源</view>
+			<view>
+				<radio-group class="radio-box" @change="changeRadio">
+					<label class="radio" v-for="(item, index) in urlList" :key="index">
+						<radio color="#5ba757" :value="item.value" :checked="item.value === currentUrl"/>{{item.name}}
+					</label>
+				</radio-group>
 			</view>
 		</view>
+
 		<view class="des-box">
 			<view>剧情简介</view>
 			<view class="content">
@@ -82,17 +84,28 @@
 			},
 			async getData() {
 				uni.showLoading({
-					title: '视频加载中，请耐心等待'
+					title: '视频加载中...'
 				})
-				let res = await wx.cloud.callFunction({
-					name: 'getSearchVideo',
-					data: {
-						search: this.movieName,
-						movieId: this.movieId
-					}
-				})
+				let res
+				try {
+					res = await wx.cloud.callFunction({
+						name: 'getSearchVideo',
+						data: {
+							search: this.movieName,
+							sourceNo: this.config.sourceNo || 1
+						}
+					})
+				} catch (e) {
+					uni.hideLoading()
+					console.log(e)
+					uni.showToast({
+						title: `抱歉，获取视频信息错误!`,
+						icon: 'none',
+					})
+					return
+				}
 				uni.hideLoading()
-				if(res.errMsg === 'cloud.callFunction:ok') {
+				if(res && res.errMsg === 'cloud.callFunction:ok') {
 					let data = res.result
 					if(data && data.videoName) {
 						this.movieData = data || {}
@@ -101,7 +114,6 @@
 							this.currentUrl = this.urlList[0].value
 						}
 					} else {
-						this.noData = true
 						uni.showToast({
 							title: `抱歉，暂无视频播放源!`,
 							icon: 'none',
