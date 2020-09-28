@@ -58,11 +58,11 @@ async function getVideo100 (search) {
     // // 遍历dom集数组
     linksDom.each((index, item) => {
       fetchPages.push(
-        fetch({
-          url: $(item).attr('href'),
-          method: 'get',
-          timeout: 600000,
-        })
+          fetch({
+            url: $(item).attr('href'),
+            method: 'get',
+            timeout: 600000,
+          })
       )
     })
     console.log(`开始请求${fetchPages.length}个页面`)
@@ -132,15 +132,58 @@ async function getVideo432115(search) {
           }
         }).filter(e => !!e.value)
         returnList.push(
-          {
-            videoName: data.vod_name,
-            actor: data.vod_actor,
-            videoType: data.vod_class,
-            decs: data.vod_content,
-            director: data.vod_director,
-            coverImg: data.vod_pic,
-            urlList
+            {
+              videoName: data.vod_name,
+              actor: data.vod_actor,
+              videoType: data.vod_class,
+              decs: data.vod_content,
+              director: data.vod_director,
+              coverImg: data.vod_pic,
+              urlList
+            }
+        )
+      }
+    })
+  }
+  return returnList
+}
+
+// 驰一影视
+async function getVideoGo180(search) {
+  const url = 'https://wx.go180.cn/app/index.php?i=182&t=0&v=1.0.1&from=wxapp&c=entry&a=wxapp&do=Search&m=sg_movie'
+  let res = await fetch({
+    url,
+    params: {
+      sign: getUUID(),
+      key: search
+    },
+    method: 'get',
+    timeout: 60000,
+  });
+  let returnList = []
+  if(res && res.data && res.data.length) {
+    let dataList = res.data
+    dataList.forEach(data => {
+      if(data.vod_play_url && data.vod_play_url.length) {
+        let urlList = []
+        let list = `${data.vod_play_url || ''}`.split('$$$')
+        urlList = list.map(e => {
+          let item = e.split('$')
+          return {
+            name: item[0],
+            value: item[1]
           }
+        }).filter(e => !!e.value)
+        returnList.push(
+            {
+              videoName: data.vod_name,
+              actor: data.vod_actor,
+              videoType: data.vod_class,
+              decs: data.vod_content,
+              director: data.vod_director,
+              coverImg: data.vod_pic,
+              urlList
+            }
         )
       }
     })
@@ -180,15 +223,15 @@ async function getVideoIyx3(search) {
           }
         }).filter(e => !!e.value)
         returnList.push(
-          {
-            videoName: data.vod_name,
-            actor: data.vod_actor,
-            videoType: data.vod_class,
-            decs: data.vod_content,
-            director: data.vod_director,
-            coverImg: data.vod_pic,
-            urlList
-          }
+            {
+              videoName: data.vod_name,
+              actor: data.vod_actor,
+              videoType: data.vod_class,
+              decs: data.vod_content,
+              director: data.vod_director,
+              coverImg: data.vod_pic,
+              urlList
+            }
         )
       }
     })
@@ -260,16 +303,16 @@ async function getVideoZy (search) {
           })
         }
         returnList.push(
-          {
-            videoName: data.vod_name,
-            actor: data.vod_actor,
-            videoType: data.vod_class,
-            decs: data.vod_content,
-            director: data.vod_director,
-            coverImg: data.vod_pic,
-            urlList,
-            downList
-          }
+            {
+              videoName: data.vod_name,
+              actor: data.vod_actor,
+              videoType: data.vod_class,
+              decs: data.vod_content,
+              director: data.vod_director,
+              coverImg: data.vod_pic,
+              urlList,
+              downList
+            }
         )
       }
     })
@@ -277,39 +320,91 @@ async function getVideoZy (search) {
   return returnList
 }
 
+function filterVideo(list = []) {
+  let hideList = []
+  return list.filter(e => {
+    return !hideList.some(e2 => e.videoName.includes(e2))
+  })
+
+
+}
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   let {search, sourceNo = 1} = event;
   try {
-    const wxContext = cloud.getWXContext(search)
+    const wxContext = cloud.getWXContext()
     let returnList = [];
     let nextSourceNo;
-    if (sourceNo === 1) { // 来源
+    let apiList = [
+      // 驰一影视
+      getVideoGo180,
+      // 天天在线电影大全7
+      getVideo432115,
       // 知也电影
-      returnList = await getVideoZy(search)
-      nextSourceNo = 2
-    } else if(sourceNo === 2) {
-      // 天天在线电影大全
-      returnList = await getVideo432115(search)
-      nextSourceNo = 3
-    } else if (sourceNo === 3) {
+      getVideoZy,
       // 一杯电影
-      returnList = await getVideo100(search)
-      nextSourceNo = 4
-    } else if (sourceNo === 4) {
+      getVideo100,
       // 在线会员热门电影
-      returnList = await getVideoIyx3(search)
-      nextSourceNo = -1
+      getVideoIyx3
+    ]
+    let api = apiList[sourceNo - 1]
+    if(api) {
+      returnList = await api(search)
+      if (sourceNo === apiList.length) {
+        nextSourceNo = -1
+      } else {
+        nextSourceNo = sourceNo + 1
+      }
     } else {
       nextSourceNo = 1
     }
-
-    if(returnList && returnList.length) {
-      return returnList[0]
+    try {
+      await addSearch(search, returnList.length > 0)
+    } catch (e) {
     }
-    return null
+    return {
+      list: filterVideo(returnList),
+      nextSourceNo
+    }
   }catch (e) {
-    console.log(e)
-    return null
+    let nextSourceNo = ++sourceNo;
+    if (nextSourceNo > 4) {
+      nextSourceNo = -1
+    }
+    return {
+      list: [],
+      nextSourceNo
+    }
+  }
+}
+
+async function addSearch (search, haveData) {
+  const _ = db.command
+  let dbName = 'searchList'
+  let countRes = await db.collection(dbName).where({
+    search: search
+  }).count()
+  if(countRes.total === 0) { // 不存在则添加
+    await db.collection(dbName).add({
+      // data 字段表示需新增的 JSON 数据
+      data: {
+        search,
+        searchCount: 1,
+        modifyTime: new Date(),
+        haveData
+      }
+    })
+  } else {
+    await db.collection(dbName).where({
+      search: search
+    })
+    .update({
+      data: {
+        searchCount: _.inc(1),
+        modifyTime: new Date(),
+        haveData
+      },
+    })
   }
 }

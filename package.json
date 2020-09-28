@@ -61,6 +61,8 @@
     "htmlparser2": "^4.1.0",
     "jsdom": "^16.4.0",
     "regenerator-runtime": "^0.12.1",
+    "sass": "^1.26.11",
+    "sass-loader": "^10.0.2",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
     "vue": "^2.6.11",

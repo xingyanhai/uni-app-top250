@@ -211,11 +211,10 @@
 			/* ----------------------获取豆瓣电影 end--------------- */
 
 			toDetail (data) {
-				if (this.config && this.config.showVideo) {
-					uni.navigateTo({
-						url: `/pages/top250/detail?id=${data.movieId}&name=${data.name}`
-					})
-				}
+				wx.setStorageSync('search', data.name)
+				uni.switchTab({
+					url: `/pages/video-search/video-search`
+				})
 			}
 		},
 		onReachBottom() {

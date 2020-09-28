@@ -7,17 +7,23 @@
 			}
 		},
 		{
-			"path": "pages/top250/detail",
-			"style": {
-				"navigationBarTitleText": "豆瓣电影Top250"
-			}
-		},
-		{
 			"path": "pages/center/center",
 			"style": {
 				"navigationBarTitleText": "个人中心",
 				"enablePullDownRefresh": true,
 				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/video-search/video-search",
+			"style": {
+				"navigationBarTitleText": "电影搜索"
+			}
+		},
+		{
+			"path": "pages/video-search/detail",
+			"style": {
+				"navigationBarTitleText": "电影详情"
 			}
 		},
 		{
@@ -46,6 +52,12 @@
 				"iconPath": "static/img/movie-0.png",
 				"selectedIconPath": "static/img/movie-1.png",
 				"text": "Top250"
+			},
+			{
+				"pagePath": "pages/video-search/video-search",
+				"iconPath": "static/img/search-0.png",
+				"selectedIconPath": "static/img/search-1.png",
+				"text": "搜索"
 			},
 			{
 				"pagePath": "pages/center/center",

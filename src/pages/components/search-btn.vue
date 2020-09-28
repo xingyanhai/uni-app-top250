@@ -8,27 +8,27 @@
 </template>
 
 <script>
-  export default {
-    name: "search-btn",
-    props: {
-      value: String,
-      placeholder: String,
-      searchText: {
-        default: '搜索',
-        type: String
-      }
-    },
-    computed: {
-      search: {
-        get () {
-          return this.value
+    export default {
+        name: "search-btn",
+        props: {
+            value: String,
+            placeholder: String,
+            searchText: {
+                default: '搜索',
+                type: String
+            }
         },
-        set (val) {
-          this.$emit('input', val)
+        computed: {
+            search: {
+                get () {
+                    return this.value
+                },
+                set (val) {
+                    this.$emit('input', val)
+                }
+            }
         }
-      }
     }
-  }
 </script>
 
 <style scoped lang="stylus">
@@ -40,22 +40,22 @@
     .search-box {
         width 100%
         display: flex;
-        border: 1px solid $uni-border-color;
+        border: 1px solid $uni-color-primary;
         border-radius: 5px;
         overflow hidden;
-    .input{
-        flex: 1;
-        line-height 40px
-        padding 5px;
-    }
-    .btn {
-        background-color $uni-list-item-hover-color;
-        color #fff
-        border-radius 0
-        border none
-        width auto
-        padding 0 20px
-    }
+        .input{
+            flex: 1;
+            line-height 40px
+            padding 5px;
+        }
+        .btn {
+            background-color $uni-color-primary;
+            color #fff
+            border-radius 0
+            border none
+            width auto
+            padding 0 20px
+        }
 
     }
 </style>

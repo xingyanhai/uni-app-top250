@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "wx-server-sdk": "~2.1.2",
+    "wx-server-sdk": "latest",
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3"
   }
