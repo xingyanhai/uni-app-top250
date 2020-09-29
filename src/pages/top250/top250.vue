@@ -3,31 +3,34 @@
 <template>
 	<view class="wrap">
 		<view class="list" v-if="dataList && dataList.length">
-			<view class="item" v-for="(value, index) in dataList"
-				  :key="index"
-				  @tap="toDetail(value)">
-				<view class="left">
-					<text class="no">No.{{value.index}}</text>
-					<image class="img" mode="widthFix" :src="value.coverImgSrc"></image>
-				</view>
-				<view class="right">
-					<view class="title">{{value.name}}</view>
-					<view class="content">
-						<view class="c-item score">
-							<text>评分 <text class="value">{{value.score}}</text></text>
-							<text class="commit">{{value.commitCount}}</text>
+			<view class="item-warp" v-for="(value, index) in dataList" :key="index">
+				<view class="item" @tap="toDetail(value)">
+					<view class="left">
+						<text class="no">No.{{value.index}}</text>
+						<image class="img" mode="widthFix" :src="value.coverImgSrc"></image>
+					</view>
+					<view class="right">
+						<view class="title">{{value.name}}</view>
+						<view class="content">
+							<view class="c-item score">
+								<text>评分 <text class="value">{{value.score}}</text></text>
+								<text class="commit">{{value.commitCount}}</text>
+							</view>
+							<view class="c-item">
+								{{value.actorText}}
+							</view>
+							<view class="c-item">
+								{{value.typeText}}
+							</view>
+							<text class="on-word">
+								“{{value.oneWord}}”
+							</text>
 						</view>
-						<view class="c-item">
-							{{value.actorText}}
-						</view>
-						<view class="c-item">
-							{{value.typeText}}
-						</view>
-						<text class="on-word">
-							“{{value.oneWord}}”
-						</text>
 					</view>
 				</view>
+				<ad-custom v-if="index % 15 === 0 && config && config.showAd" unit-id="adunit-a44687b976e11d8b"></ad-custom>
+				<ad-custom v-else-if="index % 10 === 0 && config && config.showAd" unit-id="adunit-f51066d8cf02a73b"></ad-custom>
+				<ad v-else-if="index % 5 === 0 && config && config.showAd" unit-id="adunit-3be43ae91aa5401d"></ad>
 			</view>
 		</view>
 		<view class="common-no-data-box">
@@ -294,5 +297,7 @@
 	margin 20px 0
 	color #999
 	width 100%
+	display block
+.item-warp
 	display block
 </style>

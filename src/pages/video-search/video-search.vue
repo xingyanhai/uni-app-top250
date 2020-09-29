@@ -54,7 +54,7 @@
                 </view>
             </view>
             <view class="bottom-ad-box" v-if="config && config.showAd">
-                <ad-custom ad-theme="black" unit-id="adunit-6bb619e3fa5b2d94"></ad-custom>
+                <ad-custom v-if="config && config.showAd" unit-id="adunit-f1376a5f253c11b3"></ad-custom>
             </view>
         </view>
     </view>
@@ -250,7 +250,7 @@
                 // 在页面onLoad回调事件中创建激励视频广告实例
                 if (wx.createRewardedVideoAd && this.config && this.config.showAd && !this.videoAd) {
                     this.videoAd = wx.createRewardedVideoAd({
-                        adUnitId: 'adunit-026934ef3981fcdd'
+                        adUnitId: 'adunit-bba649702bc4cf3a'
                     })
                     this.videoAd.onLoad(() => {
                     })

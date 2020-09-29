@@ -39,6 +39,9 @@
 				<text class="list-text">{{value.shareText || '更多'}}</text>
 				<text class="navigat-arrow">&#xe65e;</text>
 			</view>
+			<view class="bottom-ad">
+				<ad v-if="config && config.showAd" unit-id="adunit-c35647099c19861e" ad-type="grid" grid-opacity="0.8" grid-count="5" ad-theme="white"></ad>
+			</view>
 		</view>
 	</view>
 </template>
@@ -107,6 +110,20 @@
 					}
 				})
 			},
+			showInterstitialAd () {
+				// 在页面中定义插屏广告
+				let interstitialAd = null
+				// 在页面onLoad回调事件中创建插屏广告实例
+				if (wx.createInterstitialAd && this.config && this.config.showAd) {
+					interstitialAd = wx.createInterstitialAd({
+						adUnitId: 'adunit-2c2c620d2ac7166d'
+					})
+					interstitialAd.onLoad(() => {})
+					interstitialAd.onError((err) => {})
+					interstitialAd.onClose(() => {})
+					interstitialAd.show()
+				}
+			}
 		},
        // 加了这个页面才可以被分享
 		onShareAppMessage: function (res) {
@@ -115,6 +132,9 @@
 		onLoad() {
 			console.log(this.userPower)
 			// this.getUserInfo()
+			setTimeout(() => {
+				this.showInterstitialAd()
+			}, 1000)
 		}
 	}
 </script>
@@ -230,5 +250,13 @@
 		font-size 14px
 		line-height: 90upx
 		width 100%
+	}
+	.bottom-ad{
+		display block
+		position fixed
+		width 100%
+		bottom 0
+		left 0
+		right 0
 	}
 </style>
